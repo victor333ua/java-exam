@@ -7,41 +7,70 @@ import com.binary_studio.fleet_commander.core.subsystems.contract.DefenciveSubsy
 
 public final class DefenciveSubsystemImpl implements DefenciveSubsystem {
 
+	private final String name;
+	private final PositiveInteger pqReq, capacitorConsumption;
+	private final PositiveInteger impactReductionPercent;
+	private final PositiveInteger shieldRegeneration;
+	private final PositiveInteger hullRegeneration;
+
+
+	private DefenciveSubsystemImpl (String name, PositiveInteger powergridConsumption,
+									PositiveInteger capacitorConsumption, PositiveInteger impactReductionPercent,
+									PositiveInteger shieldRegeneration, PositiveInteger hullRegeneration) {
+
+		this.pqReq = powergridConsumption;
+		this.capacitorConsumption = capacitorConsumption;
+		this.name = name;
+		this.impactReductionPercent = impactReductionPercent;
+		this.shieldRegeneration = shieldRegeneration;
+		this.hullRegeneration = hullRegeneration;
+	}
+
 	public static DefenciveSubsystemImpl construct(String name, PositiveInteger powergridConsumption,
 			PositiveInteger capacitorConsumption, PositiveInteger impactReductionPercent,
 			PositiveInteger shieldRegeneration, PositiveInteger hullRegeneration) throws IllegalArgumentException {
-		// TODO: Ваш код здесь :)
-		return null;
+
+		if(name == null || name.isBlank()) throw new IllegalArgumentException ("Name should be not null and not empty");
+		return new DefenciveSubsystemImpl (name, powergridConsumption,
+				capacitorConsumption, impactReductionPercent,
+				shieldRegeneration, hullRegeneration );
 	}
 
 	@Override
 	public PositiveInteger getPowerGridConsumption() {
-		// TODO: Ваш код здесь :)
-		return null;
+		return pqReq;
 	}
 
 	@Override
 	public PositiveInteger getCapacitorConsumption() {
-		// TODO: Ваш код здесь :)
-		return null;
+		return capacitorConsumption;
 	}
 
 	@Override
 	public String getName() {
-		// TODO: Ваш код здесь :)
-		return null;
+		return name;
 	}
 
 	@Override
 	public AttackAction reduceDamage(AttackAction incomingDamage) {
-		// TODO: Ваш код здесь :)
-		return null;
+		int incDam = incomingDamage.damage.value();
+		int reducedDamage = (int)Math.ceil(incDam * (1. - impactReductionPercent.value()/100.));
+		int minDamage = (int)Math.ceil(incDam * 0.05);
+		if(reducedDamage < minDamage) reducedDamage = minDamage;
+
+		return new AttackAction(PositiveInteger.of(reducedDamage),
+								incomingDamage.attacker,
+								incomingDamage.target,
+								incomingDamage.weapon
+								);
 	}
 
 	@Override
 	public RegenerateAction regenerate() {
-		// TODO: Ваш код здесь :)
-		return null;
+
+		return new RegenerateAction(
+				PositiveInteger.of((int)Math.ceil(shieldRegeneration.value() * (1. + impactReductionPercent.value()/100.))),
+				PositiveInteger.of((int)Math.ceil(hullRegeneration.value() * (1. + impactReductionPercent.value()/100.))));
 	}
 
 }

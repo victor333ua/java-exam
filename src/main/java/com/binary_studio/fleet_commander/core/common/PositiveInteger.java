@@ -24,7 +24,7 @@ public final class PositiveInteger {
 		if (obj == null || obj.getClass() != PositiveInteger.class) {
 			return false;
 		}
-		return ((PositiveInteger) obj).underlyingVal == this.underlyingVal;
+		return ((PositiveInteger) obj).value() == this.underlyingVal;
 	}
 
 	@Override
