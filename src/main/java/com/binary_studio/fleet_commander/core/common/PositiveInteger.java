@@ -32,4 +32,8 @@ public final class PositiveInteger {
 		return this.underlyingVal.hashCode();
 	}
 
+	public PositiveInteger plus (PositiveInteger pInt) {
+		return PositiveInteger.of(this.value() + pInt.value());
+	}
+
 }

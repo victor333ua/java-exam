@@ -11,45 +11,55 @@ import com.binary_studio.fleet_commander.core.ship.contract.CombatReadyVessel;
 
 public final class CombatReadyShip implements CombatReadyVessel {
 
+	private DockedShip vessel = null;
+	private int capacitor;
+
+	public CombatReadyShip(DockedShip vessel){
+		this.vessel = vessel;
+		capacitor = vessel.getCapacitor().value();
+	}
+
 	@Override
 	public void endTurn() {
-		// TODO: Ваш код здесь :)
-
+		int capacitor0 = vessel.getCapacitor().value();
+		capacitor += vessel.getCapacitorRegeneration().value();
+		if(capacitor > capacitor0) capacitor = capacitor0;
 	}
 
 	@Override
 	public void startTurn() {
-		// TODO: Ваш код здесь :)
 
 	}
 
 	@Override
 	public String getName() {
-		// TODO: Ваш код здесь :)
-		return null;
+		return vessel.getName();
 	}
 
 	@Override
 	public PositiveInteger getSize() {
-		// TODO: Ваш код здесь :)
-		return null;
+		return vessel.getSize();
 	}
 
 	@Override
 	public PositiveInteger getCurrentSpeed() {
-		// TODO: Ваш код здесь :)
-		return null;
+		return vessel.getSpeed();
 	}
 
 	@Override
 	public Optional<AttackAction> attack(Attackable target) {
-		// TODO: Ваш код здесь :)
-		return null;
+		// capacity consumption
+		int cupConsuption = vessel.getAttackSubsystem().getCapacitorConsumption().value();
+		if(capacitor < cupConsuption) return Optional.empty();
+		capacitor -= cupConsuption;
+
+		return Optional.of(new AttackAction(vessel.getAttackSubsystem().attack(target),
+								this, target, vessel.getAttackSubsystem()));
 	}
 
 	@Override
 	public AttackResult applyAttack(AttackAction attack) {
-		// TODO: Ваш код здесь :)
+
 		return null;
 	}
 
