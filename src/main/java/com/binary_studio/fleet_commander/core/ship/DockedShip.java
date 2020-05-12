@@ -110,16 +110,16 @@ public final class DockedShip implements ModularVessel {
 			attackSubsystem = null;
 			return;
 		}
-	// refit
-		if(attackSubsystem != null)
-			pg = pg.plus(attackSubsystem.getPowerGridConsumption());
 
 	// does it have enough power
 		int missingMW = subsystem.getPowerGridConsumption().value() - pg.value();
 		if(missingMW > 0)
 			throw new InsufficientPowergridException(missingMW);
+	// refit
+		if(attackSubsystem != null)
+			pg = pg.plus(attackSubsystem.getPowerGridConsumption());
 
-		pg = PositiveInteger.of(pg.value() - missingMW);
+		pg = pg.minus(subsystem.getPowerGridConsumption());
 		attackSubsystem = subsystem;
 	}
 
@@ -134,17 +134,16 @@ public final class DockedShip implements ModularVessel {
 			return;
 		}
 
-	// refit
-		if(defenciveSubsystem != null)
-			pg = pg.plus(defenciveSubsystem.getPowerGridConsumption());
-
 	// does it have enough power
 		int missingMW = subsystem.getPowerGridConsumption().value() - pg.value();
 		if(missingMW > 0)
 			throw new InsufficientPowergridException(missingMW);
+	// refit
+		if(defenciveSubsystem != null)
+			pg = pg.plus(defenciveSubsystem.getPowerGridConsumption());
 
+		pg = pg.minus(subsystem.getPowerGridConsumption());
 		defenciveSubsystem = subsystem;
-		pg = PositiveInteger.of(pg.value() - missingMW);
 	}
 
 	public CombatReadyShip undock() throws NotAllSubsystemsFitted {

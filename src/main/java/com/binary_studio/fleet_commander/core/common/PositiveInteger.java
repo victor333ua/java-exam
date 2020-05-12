@@ -35,5 +35,7 @@ public final class PositiveInteger {
 	public PositiveInteger plus (PositiveInteger pInt) {
 		return PositiveInteger.of(this.value() + pInt.value());
 	}
-
+	public PositiveInteger minus (PositiveInteger pInt) {
+		return PositiveInteger.of(this.value() - pInt.value());
+	}
 }
