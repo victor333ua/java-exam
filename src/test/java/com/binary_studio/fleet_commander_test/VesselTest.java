@@ -197,6 +197,7 @@ public class VesselTest {
 			AttackResult.DamageRecived res = (AttackResult.DamageRecived) ship
 					.applyAttack(new AttackAction(PositiveInteger.of(100), attacker, ship, weapon));
 			assertEquals(50, res.damage.value(), "Should reduce impact correctly");
+
 			Optional<RegenerateAction> regen = ship.regenerate();
 			assertTrue(regen.isPresent(), "Should regenerate");
 			assertEquals(0, regen.get().hullHPRegenerated.value(), "Should regen hull correctly");

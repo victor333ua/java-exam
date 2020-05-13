@@ -13,10 +13,14 @@ public final class CombatReadyShip implements CombatReadyVessel {
 
 	private DockedShip vessel = null;
 	private int capacitor;
+	private PositiveInteger hullValue;
+	private PositiveInteger shieldValue;
 
 	public CombatReadyShip(DockedShip vessel){
 		this.vessel = vessel;
 		capacitor = vessel.getCapacitor().value();
+		hullValue = vessel.getHullHP();
+		shieldValue = vessel.getShieldHP();
 	}
 
 	@Override
@@ -60,13 +64,58 @@ public final class CombatReadyShip implements CombatReadyVessel {
 	@Override
 	public AttackResult applyAttack(AttackAction attack) {
 
-		return null;
+		AttackAction attackAction = vessel.getDefenciveSubsystem().reduceDamage(attack);
+
+		PositiveInteger damage = attackAction.damage;
+
+		if(shieldValue.value() > damage.value()) shieldValue = shieldValue.minus(damage);
+		else {
+			int iHullValue = hullValue.plus(shieldValue).value() - damage.value();
+			if(iHullValue <= 0)
+				return new AttackResult.Destroyed();
+			hullValue = PositiveInteger.of(iHullValue);
+			shieldValue = PositiveInteger.of(0);
+		}
+		return new AttackResult.DamageRecived(attackAction.weapon, attackAction.damage, attackAction.target);
 	}
 
 	@Override
 	public Optional<RegenerateAction> regenerate() {
-		// TODO: Ваш код здесь :)
-		return null;
-	}
+		// capacity consumption
+		int cupConsuption = vessel.getDefenciveSubsystem().getCapacitorConsumption().value();
+		if(capacitor < cupConsuption) return Optional.empty();
 
+		// delta for regeneration
+		RegenerateAction regenerateAction = vessel.getDefenciveSubsystem().regenerate();
+		PositiveInteger deltaHull = regenerateAction.hullHPRegenerated;
+		PositiveInteger deltaShield = regenerateAction.shieldHPRegenerated;
+		PositiveInteger hull0 =  vessel.getHullHP();
+		PositiveInteger shield0 = vessel.getShieldHP();
+
+		capacitor -= cupConsuption;
+
+		if(hullValue == vessel.getHullHP() && shieldValue == vessel.getShieldHP())
+			return Optional.of(new RegenerateAction(PositiveInteger.of(0), PositiveInteger.of(0)));
+
+		if(hullValue == hull0) deltaHull = PositiveInteger.of(0);
+		else {
+			if(hullValue.plus(deltaHull).value() > hull0.value()){
+				deltaHull = hull0.minus(hullValue);
+				hullValue = hull0;
+			}
+			else
+				hullValue = hullValue.plus(deltaHull);
+		}
+		if(shieldValue == shield0) deltaShield = PositiveInteger.of(0);
+		else {
+			if(shieldValue.plus(deltaShield).value() > shield0.value()){
+				deltaShield = shield0.minus(shieldValue);
+				shieldValue = shield0;
+			}
+			else
+				shieldValue = shieldValue.plus(deltaHull);
+		}
+
+		return Optional.of(new RegenerateAction(deltaShield, deltaHull));
+	}
 }

@@ -67,10 +67,7 @@ public final class DefenciveSubsystemImpl implements DefenciveSubsystem {
 
 	@Override
 	public RegenerateAction regenerate() {
-
-		return new RegenerateAction(
-				PositiveInteger.of((int)Math.ceil(shieldRegeneration.value() * (1. + impactReductionPercent.value()/100.))),
-				PositiveInteger.of((int)Math.ceil(hullRegeneration.value() * (1. + impactReductionPercent.value()/100.))));
+		// amounts of regeneration
+		return new RegenerateAction(shieldRegeneration, hullRegeneration);
 	}
-
 }
